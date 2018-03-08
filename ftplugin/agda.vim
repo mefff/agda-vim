@@ -128,7 +128,16 @@ goals = {}
 
 agdaVersion = [0,0,0,0]
 
-rewriteMode = "Normalised"
+DEFAULT_REWRITE_MODE = "Simplified"
+rewriteMode = DEFAULT_REWRITE_MODE
+
+def setRewriteMode(mode):
+    global rewriteMode
+    mode = mode.strip()
+    if mode not in ["AsIs", "Normalised", "Simplified", "HeadNormal", "Instantiated"]:
+        rewriteMode = DEFAULT_REWRITE_MODE
+    else:
+        rewriteMode = mode
 
 # This technically needs to turn a string into a Haskell escaped string, buuuut just gonna cheat.
 def escape(s):
@@ -137,14 +146,6 @@ def escape(s):
 # This technically needs to turn a Haskell escaped string into a string, buuuut just gonna cheat.
 def unescape(s):
     return s.replace('\\\\','\x00').replace('\\"', '"').replace('\\n','\n').replace('\x00', '\\') # hacktastic
-
-def setRewriteMode(mode):
-    global rewriteMode
-    mode = mode.strip()
-    if mode not in ["AsIs", "Normalised", "Simplified", "HeadNormal", "Instantiated"]:
-        rewriteMode = "Normalised"
-    else:
-        rewriteMode = mode
 
 def promptUser(msg):
     vim.command('call inputsave()')
