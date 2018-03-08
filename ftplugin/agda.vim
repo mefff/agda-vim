@@ -59,6 +59,8 @@ let s:python_cmd = s:using_python2 ? 'py ' : 'py3 '
 
 if has('python') " || has('python3')
 
+let b:agdavim_status = 'Agda'
+
 function! s:LogAgda(name, text, append)
     let agdawinnr = bufwinnr('__Agda__')
     let prevwinnr = winnr()
@@ -81,6 +83,7 @@ function! s:LogAgda(name, text, append)
         setlocal textwidth=0
         setlocal nocursorline
         setlocal nocursorcolumn
+        setlocal filetype=agda-panel
 
         if exists('+relativenumber')
             setlocal norelativenumber
@@ -98,11 +101,10 @@ function! s:LogAgda(name, text, append)
     let eventignore_save = &eventignore
     set eventignore=all
 
+    let b:agdavim_status = a:name
     if a:append == 'True'
-        exec 'setlocal statusline=' . substitute(a:name, ' ', '\\ ', 'g')
         silent put =a:text
     else
-        exec 'setlocal statusline=' . substitute(a:name, ' ', '\\ ', 'g')
         silent %delete _
         silent 0put =a:text
     endif
