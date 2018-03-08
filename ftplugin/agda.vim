@@ -129,7 +129,11 @@ import subprocess
 
 # start Agda
 # TODO: I'm pretty sure this will start an agda process per buffer which is less than desirable...
-agda = subprocess.Popen(["agda", "--interaction"], bufsize = 1, stdin = subprocess.PIPE, stdout = subprocess.PIPE, universal_newlines = True)
+agda = None
+def RestartAgda():
+    global agda
+    agda = subprocess.Popen(["agda", "--interaction"], bufsize = 1, stdin = subprocess.PIPE, stdout = subprocess.PIPE, universal_newlines = True)
+RestartAgda()
 
 goals = {}
 
@@ -159,10 +163,6 @@ def promptUser(msg):
     result = vim.eval('input("%s")' % msg)
     vim.command('call inputrestore()')
     return result
-
-def RestartAgda():
-    global agda
-    agda = subprocess.Popen(["agda", "--interaction"], bufsize = 1, stdin = subprocess.PIPE, stdout = subprocess.PIPE, universal_newlines = True)
 
 def findGoals(goalList):
     global goals
