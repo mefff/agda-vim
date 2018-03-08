@@ -1,6 +1,6 @@
 " File: ~/.vim/syntax/agda.vim
 
-" This is reproduced from 
+" This is reproduced from
 " http://wiki.portal.chalmers.se/agda/pmwiki.php?n=Main.VIMEditing
 " for convenience
 
@@ -44,7 +44,7 @@ hi def link agdaString           String
 hi def link agdaConstructor      Constant
 hi def link agdaCharCode         SpecialChar
 hi def link agdaCharCodeErr      Error
-hi def link agdaHole             WarningMsg
+hi def link agdaHole             Todo
 hi def link agdaDubious          WarningMsg
 hi def link agdaKeywords         Structure
 hi def link agdaFunction         Macro
