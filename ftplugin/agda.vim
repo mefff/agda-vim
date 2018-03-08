@@ -435,6 +435,21 @@ else:
 EOF
 endfunction
 
+function! SolveConstraints()
+exec s:python_until_eof
+import vim
+result = getHoleBodyAtCursor()
+if result is None:
+    print("No hole under the cursor, solving all")
+    sendCommand('Cmd_solveAll %s' % rewriteMode)
+elif result[1] is None:
+    print("Goal not loaded")
+else:
+    sendCommand('Cmd_solveOne %s %d noRange "%s"' %
+                (rewriteMode, result[1], escape(result[0])))
+EOF
+endfunction
+
 function! Context(mode)
 exec s:python_until_eof
 import vim
@@ -557,6 +572,7 @@ function! ResizeAgdaWindow()
     endif
 endfunction
 
+" TODO rename so that all commands start with Agda (like Intero* commands)
 command! -nargs=0 Load call Load(0)
 command! -nargs=0 AgdaVersion call AgdaVersion(0)
 command! -nargs=0 Reload silent! make!|redraw!
@@ -566,7 +582,7 @@ command! -nargs=0 HideImplicitArguments exec s:python_cmd "sendCommand('ShowImpl
 command! -nargs=0 ToggleImplicitArguments exec s:python_cmd "sendCommand('ToggleImplicitArgs')"
 command! -nargs=0 Constraints exec s:python_cmd "sendCommand('Cmd_constraints')"
 command! -nargs=0 Metas exec s:python_cmd "sendCommand('Cmd_metas')"
-command! -nargs=0 SolveAll exec s:python_cmd "sendCommand('Cmd_solveAll')"
+command! -nargs=0 SolveConstraints call SolveConstraints()
 command! -nargs=1 ShowModule call ShowModule(<args>)
 command! -nargs=1 WhyInScope call WhyInScope(<args>)
 command! -nargs=0 SetRewriteModeAsIs exec s:python_cmd "setRewriteMode('AsIs')"
