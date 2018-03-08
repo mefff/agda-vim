@@ -66,7 +66,8 @@ function! s:LogAgda(name, text, append)
         let eventignore_save = &eventignore
         set eventignore=all
 
-        silent keepalt botright 8split __Agda__
+        silent keepalt botright split __Agda__
+        call ResizeAgdaWindow()
 
         let &eventignore = eventignore_save
         setlocal noreadonly
@@ -533,6 +534,20 @@ elif result[0] == "?":
 else:
     sendCommand('Cmd_helper_function %s %d noRange "%s"' % (rewriteMode, result[1], escape(result[0])))
 EOF
+endfunction
+
+function! HideAgdaWindow()
+    let agdawinnr = bufwinnr('__Agda__')
+    if agdawinnr != -1
+        exec 'silent! ' . agdawinnr . 'wincmd c'
+    endif
+endfunction
+
+function! ResizeAgdaWindow()
+    let agdawinnr = bufwinnr('__Agda__')
+    if agdawinnr != -1
+        exec 'silent! ' . agdawinnr . 'resize 10'
+    endif
 endfunction
 
 command! -nargs=0 Load call Load(0)
