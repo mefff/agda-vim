@@ -215,13 +215,18 @@ def parseVersion(versionString):
 
 def interpretResponse(responses, quiet = False):
     for response in responses:
-        if response.startswith('(agda2-info-action ') or response.startswith('(agda2-info-action-and-copy '):
+        infoAndCopy = response.startswith('(agda2-info-action-and-copy ')
+        if response.startswith('(agda2-info-action ') or infoAndCopy:
             if quiet and '*Error*' in response: vim.command('cwindow')
             strings = re.findall(r'"((?:[^"\\]|\\.)*)"', response[19:])
             if strings[0] == '*Agda Version*':
                 parseVersion(strings[1])
             if quiet: continue
             vim.command('call s:LogAgda("%s","%s","%s")'% (strings[0], strings[1], response.endswith('t)')))
+            if infoAndCopy:
+                # copy the contents to register `h`
+                vim.command('let @h = "%s"' % strings[1].strip())
+
         elif "(agda2-goals-action '" in response:
             findGoals([int(s) for s in re.findall(r'(\d+)', response[response.index("agda2-goals-action '")+21:])])
         elif "(agda2-make-case-action-extendlam '" in response:
@@ -563,6 +568,9 @@ nnoremap <buffer> <LocalLeader>M :call ShowModule('')<CR>
 nnoremap <buffer> <LocalLeader>y :call WhyInScope('')<CR>
 nnoremap <buffer> <LocalLeader>h :call HelperFunction()<CR>
 nnoremap <buffer> <LocalLeader>m :Metas<CR>
+
+" Paste the contents from a copy action (e.g., a helper function's type)
+nnoremap <buffer> <LocalLeader>p o<tab><c-o>"h]p<esc>kJ
 
 " Show/reload metas
 nnoremap <buffer> <C-e> :Metas<CR>
