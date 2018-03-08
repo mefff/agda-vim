@@ -19,7 +19,10 @@ function! Load(quiet)
     " Do nothing.  Overidden below with a Python function if python is supported.
 endfunction
 
-au QuickfixCmdPost make call ReloadSyntax()|call AgdaVersion(1)|call Load(1)
+augroup AgdaAutoReload
+    au!
+    au QuickfixCmdPost * call ReloadSyntax()
+augroup END
 set autowrite
 
 if exists("g:agda_extraincpaths")
@@ -137,7 +140,7 @@ RestartAgda()
 
 goals = {}
 
-agdaVersion = [0,0,0,0]
+agdaVersion = None
 
 DEFAULT_REWRITE_MODE = "Simplified"
 rewriteMode = DEFAULT_REWRITE_MODE
@@ -294,6 +297,8 @@ def sendCommand(arg, quiet=False):
 
 def sendCommandLoad(file, quiet):
     global agdaVersion
+    if agdaVersion is None:
+        sendCommand('Cmd_show_version', quiet=True)
     if agdaVersion < [2,5,0,0]: # in 2.5 they changed it so Cmd_load takes commandline arguments
         incpaths_str = ",".join(vim.eval("g:agdavim_agda_includepathlist"))
     else:
