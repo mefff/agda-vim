@@ -418,16 +418,19 @@ else:
 EOF
 endfunction
 
-function! Context()
+function! Context(mode)
 exec s:python_until_eof
 import vim
+mode = vim.eval('a:mode') or rewriteMode
 result = getHoleBodyAtCursor()
 if result is None:
     print("No hole under the cursor")
 elif result[1] is None:
     print("Goal not loaded")
 else:
-    sendCommand('Cmd_goal_type_context_infer %s %d noRange "%s"' % (rewriteMode, result[1], escape(result[0])))
+    if result[0] == '?': result = ('',) + result[1:]
+    sendCommand('Cmd_goal_type_context%s %s %d noRange "%s"' %
+                ('_infer' if result[0] else '', mode, result[1], escape(result[0])))
 EOF
 endfunction
 
@@ -531,7 +534,8 @@ nnoremap <buffer> <LocalLeader>R :call Refine("True")<CR>
 nnoremap <buffer> <LocalLeader>g :call Give()<CR>
 nnoremap <buffer> <LocalLeader>c :call MakeCase()<CR>
 nnoremap <buffer> <LocalLeader>a :call Auto()<CR>
-nnoremap <buffer> <LocalLeader>e :call Context()<CR>
+nnoremap <buffer> <LocalLeader>e :call Context('')<CR>
+nnoremap <buffer> <LocalLeader>E :call Context('Normalised')<CR>
 nnoremap <buffer> <LocalLeader>n :call Normalize("IgnoreAbstract")<CR>
 nnoremap <buffer> <LocalLeader>N :call Normalize("DefaultCompute")<CR>
 nnoremap <buffer> <LocalLeader>M :call ShowModule('')<CR>
