@@ -219,6 +219,14 @@ def parseVersion(versionString):
     agdaVersion = [int(c) for c in versionString[12:].split('.')]
     agdaVersion = agdaVersion + [0]*max(0, 4-len(agdaVersion))
 
+HOLE = '?'
+INTERACTION = '{!  !}'
+def introduceInteractionPoint(s, substrLeft, substrRight=None):
+    s = s.replace(substrLeft + HOLE, substrLeft + INTERACTION)
+    if substrRight:
+        s = s.replace(HOLE + substrRight, INTERACTION + substrRight)
+    return s
+
 def interpretResponse(responses, quiet = False):
     for response in responses:
         infoAndCopy = response.startswith('(agda2-info-action-and-copy ')
@@ -236,7 +244,7 @@ def interpretResponse(responses, quiet = False):
         elif "(agda2-goals-action '" in response:
             findGoals([int(s) for s in re.findall(r'(\d+)', response[response.index("agda2-goals-action '")+21:])])
         elif "(agda2-make-case-action-extendlam '" in response:
-            response = response.replace("?", "{!   !}") # this probably isn't safe
+            response = introduceInteractionPoint(response, ' = ')
             cases = re.findall(r'"((?:[^"\\]|\\.)*)"', response[response.index("agda2-make-case-action-extendlam '")+34:])
             col = vim.current.window.cursor[1]
             line = vim.current.line
@@ -273,7 +281,7 @@ def interpretResponse(responses, quiet = False):
             sendCommandLoad(f, quiet)
             break
         elif "(agda2-make-case-action '" in response:
-            response = response.replace("?", "{!   !}") # this probably isn't safe
+            response = introduceInteractionPoint(response, ' = ')
             cases = re.findall(r'"((?:[^"\\]|\\.)*)"', response[response.index("agda2-make-case-action '")+24:])
             row = vim.current.window.cursor[0]
             prefix = re.match(r'[ \t]*', vim.current.line).group()
@@ -348,8 +356,6 @@ def getHoleBodyAtCursor():
     except AttributeError:
         return None
     result = line[start+2:end-2].strip()
-    if result == "":
-        result = "?"
     return (result, findGoal(r, start+1))
 
 def getWordAtCursor():
@@ -387,7 +393,7 @@ if result is None:
     print("No hole under the cursor")
 elif result[1] is None:
     print("Goal not loaded")
-elif result[0] == "?":
+elif not result[0]:
     sendCommand('Cmd_give %s %d noRange "%s"' % (useForce, result[1], escape(promptUser("Enter expression: "))))
 else:
     sendCommand('Cmd_give %s %d noRange "%s"' % (useForce, result[1], escape(result[0])))
@@ -402,7 +408,7 @@ if result is None:
     print("No hole under the cursor")
 elif result[1] is None:
     print("Goal not loaded")
-elif result[0] == "?":
+elif not result[0]:
     sendCommand('Cmd_make_case %d noRange "%s"' % (result[1], escape(promptUser("Make case on: "))))
 else:
     sendCommand('Cmd_make_case %d noRange "%s"' % (result[1], escape(result[0])))
@@ -418,7 +424,8 @@ if result is None:
 elif result[1] is None:
     print("Goal not loaded")
 else:
-    sendCommand('Cmd_refine_or_intro %s %d noRange "%s"' % (vim.eval('a:unfoldAbstract'), result[1], escape(result[0])))
+    sendCommand('Cmd_refine_or_intro %s %d noRange "%s"' %
+                (vim.eval('a:unfoldAbstract'), result[1], escape(result[0])))
 EOF
 endfunction
 
@@ -431,7 +438,7 @@ if result is None:
 elif result[1] is None:
     print("Goal not loaded")
 else:
-    sendCommand('Cmd_auto %d noRange "%s"' % (result[1], escape(result[0]) if result[0] != "?" else ""))
+    sendCommand('Cmd_auto %d noRange "%s"' % (result[1], escape(result[0])))
 EOF
 endfunction
 
@@ -460,7 +467,6 @@ if result is None:
 elif result[1] is None:
     print("Goal not loaded")
 else:
-    if result[0] == '?': result = ('',) + result[1:]
     sendCommand('Cmd_goal_type_context%s %s %d noRange "%s"' %
                 ('_infer' if result[0] else '', mode, result[1], escape(result[0])))
 EOF
