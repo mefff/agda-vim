@@ -400,15 +400,16 @@ else:
 EOF
 endfunction
 
-function! MakeCase()
+function! MakeCase(defnHasParams)
 exec s:python_until_eof
 import vim
 result = getHoleBodyAtCursor()
+defnHasParams = int(vim.eval('a:defnHasParams'))
 if result is None:
     print("No hole under the cursor")
 elif result[1] is None:
     print("Goal not loaded")
-elif not result[0]:
+elif defnHasParams and not result[0]:
     sendCommand('Cmd_make_case %d noRange "%s"' % (result[1], escape(promptUser("Make case on: "))))
 else:
     sendCommand('Cmd_make_case %d noRange "%s"' % (result[1], escape(result[0])))
@@ -602,7 +603,7 @@ nnoremap <buffer> <LocalLeader>t :call Infer()<CR>
 nnoremap <buffer> <LocalLeader>r :call Refine("False")<CR>
 nnoremap <buffer> <LocalLeader>R :call Refine("True")<CR>
 nnoremap <buffer> <LocalLeader>g :call Give()<CR>
-nnoremap <buffer> <LocalLeader>c :call MakeCase()<CR>
+nnoremap <buffer> <LocalLeader>c :call MakeCase(1)<CR>
 nnoremap <buffer> <LocalLeader>a :call Auto()<CR>
 nnoremap <buffer> <LocalLeader>e :call Context('')<CR>
 nnoremap <buffer> <LocalLeader>E :call Context('Normalised')<CR>
@@ -612,6 +613,10 @@ nnoremap <buffer> <LocalLeader>M :call ShowModule('')<CR>
 nnoremap <buffer> <LocalLeader>y :call WhyInScope('')<CR>
 nnoremap <buffer> <LocalLeader>h :call HelperFunction()<CR>
 nnoremap <buffer> <LocalLeader>m :Metas<CR>
+
+" Insert a skeleton definition for a function
+" TODO indent the definition to the same level as the type
+nnoremap <buffer> <LocalLeader>d ^yW}O<c-o>p= ?<esc>:call MakeCase(0)<cr>
 
 " Paste the contents from a copy action (e.g., a helper function's type)
 nnoremap <buffer> <LocalLeader>p o<tab><c-o>"h]p<esc>kJ
