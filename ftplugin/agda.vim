@@ -33,13 +33,10 @@ endif
 
 let g:agdavim_agda_includepathlist = deepcopy(g:agdavim_agda_includepathlist_unquoted)
 call map(g:agdavim_agda_includepathlist, ' ''"'' . v:val . ''"'' ')
-let &makeprg = 'agda --vim ' . '-i ' . join(g:agdavim_agda_includepathlist, ' -i ') . ' %'
 
 if !exists("g:agdavim_includeutf8_mappings") || g:agdavim_includeutf8_mappings
     runtime agda-utf8.vim
 endif
-
-set efm=\ \ /%\\&%f:%l\\,%c-%.%#,%E/%\\&%f:%l\\,%c-%.%#,%Z,%C%m,%-G%.%#
 
 " Python 3 is NOT supported.  This code and other changes are left here to
 " ease adding future Python 3 support.  Right now the main issue is that
@@ -199,11 +196,14 @@ def findGoals(goalList):
 
     vim.command('syn sync clear') # TODO: This wipes out any sync rules and should be removed if good sync rules are added to the syntax file.
 
-def findGoal(row, col):
+def findGoal(row, col, shouldReload=True):
     global goals
     for item in goals.items():
         if item[1][0] == row and item[1][1] == col:
             return item[0]
+    if shouldReload:
+        vim.command('call Load(1)')
+        return findGoal(row, col, False)
     return None
 
 def getOutput():
@@ -282,14 +282,14 @@ def interpretResponse(responses, quiet = False):
             sendCommandLoad(f, quiet)
             break
         elif response.startswith('(agda2-give-action '):
-            response = response.replace("?", "{!   !}")
+            response = introduceInteractionPoint(response, ' ', ' ')
             match = re.search(r'(\d+)\s+"((?:[^"\\]|\\.)*)"', response[19:])
             replaceHole(unescape(match.group(2)))
         else:
             pass # print(response)
 
 def sendCommand(arg, quiet=False):
-    vim.command(':silent! write')
+    vim.command('silent! noautocmd write')
     f = vim.current.buffer.name
     # The x is a really hacky way of getting a consistent final response.  Namely, "cannot read"
     agda.stdin.write('IOTCM "%s" None Indirect (%s)\nx\n' % (escape(f), arg))
@@ -575,7 +575,7 @@ endfunction
 " TODO rename so that all commands start with Agda (like Intero* commands)
 command! -nargs=0 Load call Load(0)
 command! -nargs=0 AgdaVersion call AgdaVersion(0)
-command! -nargs=0 Reload silent! make!|redraw!
+command! -nargs=0 Reload silent! call Load(1) | Metas
 command! -nargs=0 RestartAgda exec s:python_cmd 'RestartAgda()'
 command! -nargs=0 ShowImplicitArguments exec s:python_cmd "sendCommand('ShowImplicitArgs True')"
 command! -nargs=0 HideImplicitArguments exec s:python_cmd "sendCommand('ShowImplicitArgs False')"
