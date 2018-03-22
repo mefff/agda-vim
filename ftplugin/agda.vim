@@ -345,7 +345,7 @@ def getHoleBodyAtCursor():
     line = vim.current.line
     try:
         if line[c] == "?":
-            return ("?", findGoal(r, c+1))
+            return ("", findGoal(r, c+1))
     except IndexError:
         return None
     try: # handle virtual space better
@@ -477,7 +477,7 @@ function! Infer()
 exec s:python_until_eof
 import vim
 result = getHoleBodyAtCursor()
-if result is None:
+if result is None or not result[0]:
     sendCommand('Cmd_infer_toplevel %s "%s"' % (rewriteMode, escape(promptUser("Enter expression: "))))
 elif result[1] is None:
     print("Goal not loaded")
@@ -616,6 +616,7 @@ nnoremap <buffer> <LocalLeader>m :Metas<CR>
 
 " Insert a skeleton definition for a function
 " TODO indent the definition to the same level as the type
+" FIXME doesn't work if type decl at the last line of file
 nnoremap <buffer> <LocalLeader>d ^yW}O<c-o>p= ?<esc>:call MakeCase(0)<cr>
 
 " Paste the contents from a copy action (e.g., a helper function's type)
