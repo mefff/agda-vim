@@ -54,6 +54,6 @@ hi def link agdaInfixFunction    Operator
 hi def link agdaLineComment      Comment
 hi def link agdaBlockComment     Comment
 hi def link agdaPragma           Comment
-hi def      agdaTODO             cterm=bold,underline ctermfg=2 " green
-hi def      agdaFIXME            cterm=bold,underline ctermfg=3 " yellow
-hi def      agdaXXX              cterm=bold,underline ctermfg=1 " red
+hi def link agdaTODO             Todo
+hi def link agdaFIXME            Todo
+hi def link agdaXXX              Todo
