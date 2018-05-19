@@ -283,6 +283,8 @@ imap <buffer> <LocalLeader>^8 ⁸
 imap <buffer> <LocalLeader>^9 ⁹
 imap <buffer> <LocalLeader>^n ⁿ
 imap <buffer> <LocalLeader>^i ⁱ
+imap <buffer> <LocalLeader>^l ˡ
+imap <buffer> <LocalLeader>^r ʳ
 imap <buffer> <LocalLeader>^+ ⁺
 imap <buffer> <LocalLeader>^- ⁻
 imap <buffer> <LocalLeader>' ′
@@ -697,6 +699,8 @@ cmap <buffer> <LocalLeader>^8 ⁸
 cmap <buffer> <LocalLeader>^9 ⁹
 cmap <buffer> <LocalLeader>^n ⁿ
 cmap <buffer> <LocalLeader>^i ⁱ
+cmap <buffer> <LocalLeader>^l ˡ
+cmap <buffer> <LocalLeader>^r ʳ
 cmap <buffer> <LocalLeader>^+ ⁺
 cmap <buffer> <LocalLeader>^- ⁻
 cmap <buffer> <LocalLeader>' ′
