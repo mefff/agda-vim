@@ -1,4 +1,4 @@
-setlocal iskeyword=33-126,192-255
+"setlocal iskeyword=33-126,192-255
 setlocal commentstring=--\ %s
 setlocal comments=s1fl:{-,mb:\ \ ,ex:-},:--
 
