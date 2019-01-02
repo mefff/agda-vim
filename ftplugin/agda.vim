@@ -598,7 +598,7 @@ command! -nargs=0 SetRewriteModeSimplified exec s:python_cmd "setRewriteMode('Si
 command! -nargs=0 SetRewriteModeHeadNormal exec s:python_cmd "setRewriteMode('HeadNormal')"
 command! -nargs=0 SetRewriteModeInstantiated exec s:python_cmd "setRewriteMode('Instantiated')"
 
-nnoremap <buffer> <LocalLeader>l :Reload<CR>
+nnoremap <buffer> <LocalLeader>l :Load<CR>
 nnoremap <buffer> <LocalLeader>t :call Infer()<CR>
 nnoremap <buffer> <LocalLeader>r :call Refine("False")<CR>
 nnoremap <buffer> <LocalLeader>R :call Refine("True")<CR>
